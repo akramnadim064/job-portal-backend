@@ -100,46 +100,37 @@ connectDB();
 
 const app = express();
 
-/* =======================
-   CORS — THIS IS THE FIX
-======================= */
-app.use(
-  cors({
-    origin: "https://job-portal-frontend-blush-zeta.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+/* =========================
+   ✅ CORS — OPEN (FIX)
+========================= */
+app.use(cors());           // allow ALL origins
+app.options("*", cors());  // handle ALL preflight
 
-// 🔥 IMPORTANT: respond to preflight BEFORE routes
-app.options("*", cors());
-
-/* =======================
+/* =========================
    MIDDLEWARES
-======================= */
+========================= */
 app.use(express.json());
 
-/* =======================
+/* =========================
    ROUTES
-======================= */
+========================= */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
-/* =======================
+/* =========================
    HEALTH CHECK
-======================= */
+========================= */
 app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
-/* =======================
-   404 HANDLER (LAST)
-======================= */
+/* =========================
+   404 (LAST)
+========================= */
 app.use((req, res) => {
-  console.log("UNMATCHED:", req.method, req.originalUrl);
   res.status(404).json({ message: "Route not found" });
 });
 
@@ -147,3 +138,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
