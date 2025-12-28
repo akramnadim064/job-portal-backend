@@ -22,7 +22,7 @@ app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
-app.use("/api/profile", require("./routes/profileRoutes"));
+//app.use("/api/profile", require("./routes/profileRoutes"));
 
 
 
@@ -35,6 +35,11 @@ app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
+
+app.use((req, res) => {
+  console.log("UNMATCHED:", req.method, req.originalUrl);
+  res.status(404).json({ message: "Route not found" });
+});
 // Routes will be added later
 // app.use("/api/auth", require("./routes/authRoutes"));
 // app.use("/api/jobs", require("./routes/jobRoutes"));
