@@ -101,52 +101,32 @@ connectDB();
 
 const app = express();
 
-/**
- * 🔴 REQUIRED FOR RENDER
- */
-app.set("trust proxy", 1);
-
-/**
- * ✅ CORS CONFIG (EXACT)
- */
+/* ✅ SIMPLE + CORRECT CORS */
 app.use(
   cors({
-    origin: "https://job-portal-frontend-blush-zeta.vercel.app",
+    origin: "*", // <-- THIS IS THE KEY FIX
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
 
-/**
- * ✅ HANDLE PREFLIGHT
- */
+/* ✅ MUST be before routes */
 app.options("*", cors());
 
-/**
- * BODY PARSER
- */
 app.use(express.json());
 
-/**
- * ROUTES
- */
+/* ROUTES */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
-/**
- * HEALTH CHECK
- */
 app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
-/**
- * DEBUG UNMATCHED ROUTES
- */
+/* DEBUG */
 app.use((req, res) => {
   console.log("❌ UNMATCHED:", req.method, req.originalUrl);
   res.status(404).json({ message: "Route not found" });
