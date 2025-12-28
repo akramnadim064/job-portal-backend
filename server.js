@@ -89,10 +89,8 @@
 //   console.log(`Server running on port ${PORT}`);
 // });
 
-
 const express = require("express");
 const dotenv = require("dotenv");
-const cors = require("cors");
 const connectDB = require("./config/db");
 
 dotenv.config();
@@ -101,13 +99,29 @@ connectDB();
 const app = express();
 
 /* =========================
-   ✅ CORS — OPEN (FIX)
+   🔥 MANUAL CORS (NO LIB)
 ========================= */
-app.use(cors());           // allow ALL origins
-app.options("*", cors());  // handle ALL preflight
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+
+  // IMPORTANT: handle preflight HERE
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
 
 /* =========================
-   MIDDLEWARES
+   MIDDLEWARE
 ========================= */
 app.use(express.json());
 
