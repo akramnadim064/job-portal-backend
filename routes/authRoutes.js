@@ -1,15 +1,26 @@
-// // const express = require("express");
-// // const router = express.Router();
+// const express = require("express");
+// const router = express.Router();
 
-// // const { registerUser, loginUser } = require("../controllers/authController");
+// const { registerUser, loginUser } = require("../controllers/authController");
 
-// // // REGISTER
-// // router.post("/register", registerUser);
+// // REGISTER
+// router.post("/register", registerUser);
 
-// // // LOGIN
-// // router.post("/login", loginUser);
+// // LOGIN
+// router.post("/login", loginUser);
 
-// // module.exports = router;
+// module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
 
 // const express = require("express");
 // const router = express.Router();
@@ -30,19 +41,20 @@
 
 
 
-
-//no use
 const express = require("express");
 const router = express.Router();
-const { register, login } = require("../controllers/authController");
 
-/* ✅ Explicitly allow OPTIONS */
-router.options("*", (req, res) => {
-  res.sendStatus(204);
-});
+/* ✅ Correct import */
+const {
+  registerUser,
+  loginUser,
+} = require("../controllers/authController");
 
-/* Routes */
-router.post("/register", register);
-router.post("/login", login);
+/* ✅ Preflight handler (important for browser) */
+router.options("*", (req, res) => res.sendStatus(204));
+
+/* ✅ Routes */
+router.post("/register", registerUser);
+router.post("/login", loginUser);
 
 module.exports = router;
