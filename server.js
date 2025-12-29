@@ -199,37 +199,55 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 
+// Load environment variables
 dotenv.config();
+
+// Connect to MongoDB
 connectDB();
 
 const app = express();
 
 /**
- * ✅ CORS — MUST BE FIRST
- * ✅ Do NOT use credentials unless using cookies
+ * ✅ 1. CORS CONFIGURATION
+ * We allow both your specific Vercel preview link and any potential main domain.
  */
+const allowedOrigins = [
+  "https://job-portal-frontend-blush-zeta.vercel.app",
+  // Add your main production domain here if it's different
+];
+
 app.use(
   cors({
-    origin: "https://job-portal-frontend-blush-zeta.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = "The CORS policy for this site does not allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
 /**
- * ✅ HANDLE PREFLIGHT *BEFORE* ROUTES
+ * ✅ 2. HANDLE PREFLIGHT
+ * This responds to the browser's "check" request before the actual POST/GET
  */
-app.options("*", (req, res) => {
-  res.sendStatus(204);
-});
+app.options("*", cors());
 
 /**
- * ✅ BODY PARSER
+ * ✅ 3. MIDDLEWARE
  */
 app.use(express.json());
+// If you use files/images, uncomment this:
+// app.use("/uploads", express.static("uploads"));
 
 /**
- * ✅ ROUTES
+ * ✅ 4. ROUTES
  */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
@@ -238,18 +256,24 @@ app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
 /**
- * ✅ HEALTH CHECK
+ * ✅ 5. HEALTH CHECK
+ * Use this to verify if the Render server is awake
  */
 app.get("/", (req, res) => {
-  res.send("Job Portal API is running...");
+  res.status(200).json({ status: "success", message: "Job Portal API is running..." });
 });
 
 /**
- * ✅ 404 — MUST BE LAST
+ * ✅ 6. 404 CATCH-ALL
+ * If you see this in your logs, your frontend is calling the wrong URL
  */
 app.use((req, res) => {
-  console.log("UNMATCHED:", req.method, req.originalUrl);
-  res.status(404).json({ message: "Route not found" });
+  console.log(`⚠️ 404 - Not Found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ 
+    message: "Route not found", 
+    requestedUrl: req.originalUrl,
+    method: req.method 
+  });
 });
 
 const PORT = process.env.PORT || 5000;
