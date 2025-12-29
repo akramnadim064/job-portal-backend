@@ -168,8 +168,6 @@
 
 
 
-
-//Morning
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -181,34 +179,38 @@ connectDB();
 const app = express();
 
 /**
- * ✅ CORS MUST BE FIRST
- * ✅ Must allow OPTIONS
- * ✅ Must return headers BEFORE routes
+ * =====================================================
+ * 1️⃣ CORS — MUST BE FIRST (before routes)
+ * =====================================================
  */
 app.use(
   cors({
     origin: "https://job-portal-frontend-blush-zeta.vercel.app",
-    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 /**
- * ✅ THIS IS CRITICAL
- * Explicitly respond to preflight requests
+ * =====================================================
+ * 2️⃣ HANDLE PREFLIGHT (THIS FIXES YOUR ISSUE)
+ * =====================================================
  */
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-  next();
+app.options("*", (req, res) => {
+  res.sendStatus(204);
 });
 
+/**
+ * =====================================================
+ * 3️⃣ BODY PARSER
+ * =====================================================
+ */
 app.use(express.json());
 
 /**
- * ROUTES
+ * =====================================================
+ * 4️⃣ ROUTES
+ * =====================================================
  */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
@@ -217,14 +219,18 @@ app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
 /**
- * HEALTH CHECK
+ * =====================================================
+ * 5️⃣ HEALTH CHECK
+ * =====================================================
  */
 app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
 /**
- * ❌ 404 MUST BE LAST
+ * =====================================================
+ * 6️⃣ 404 — MUST BE LAST
+ * =====================================================
  */
 app.use((req, res) => {
   console.log("UNMATCHED:", req.method, req.originalUrl);
