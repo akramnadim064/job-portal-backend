@@ -93,6 +93,18 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 // const express = require("express");
 // const dotenv = require("dotenv");
 // const cors = require("cors");
@@ -168,6 +180,21 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//morning
+
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -179,9 +206,7 @@ connectDB();
 const app = express();
 
 /**
- * =====================================================
- * 1️⃣ CORS — MUST BE FIRST (before routes)
- * =====================================================
+ * ✅ CORS (MUST be first)
  */
 app.use(
   cors({
@@ -192,25 +217,14 @@ app.use(
 );
 
 /**
- * =====================================================
- * 2️⃣ HANDLE PREFLIGHT (THIS FIXES YOUR ISSUE)
- * =====================================================
+ * ✅ THIS LINE FIXES PREFLIGHT
  */
-app.options("*", (req, res) => {
-  res.sendStatus(204);
-});
+app.options("*", cors());
 
-/**
- * =====================================================
- * 3️⃣ BODY PARSER
- * =====================================================
- */
 app.use(express.json());
 
 /**
- * =====================================================
- * 4️⃣ ROUTES
- * =====================================================
+ * ROUTES
  */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
@@ -219,18 +233,14 @@ app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
 /**
- * =====================================================
- * 5️⃣ HEALTH CHECK
- * =====================================================
+ * HEALTH CHECK
  */
 app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
 /**
- * =====================================================
- * 6️⃣ 404 — MUST BE LAST
- * =====================================================
+ * 404 LAST
  */
 app.use((req, res) => {
   console.log("UNMATCHED:", req.method, req.originalUrl);
