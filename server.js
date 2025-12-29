@@ -194,7 +194,6 @@
 
 
 //morning
-
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -206,7 +205,8 @@ connectDB();
 const app = express();
 
 /**
- * ✅ CORS (MUST be first)
+ * ✅ CORS — MUST BE FIRST
+ * ✅ Do NOT use credentials unless using cookies
  */
 app.use(
   cors({
@@ -217,14 +217,19 @@ app.use(
 );
 
 /**
- * ✅ THIS LINE FIXES PREFLIGHT
+ * ✅ HANDLE PREFLIGHT *BEFORE* ROUTES
  */
-app.options("*", cors());
+app.options("*", (req, res) => {
+  res.sendStatus(204);
+});
 
+/**
+ * ✅ BODY PARSER
+ */
 app.use(express.json());
 
 /**
- * ROUTES
+ * ✅ ROUTES
  */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
@@ -233,14 +238,14 @@ app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
 /**
- * HEALTH CHECK
+ * ✅ HEALTH CHECK
  */
 app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
 /**
- * 404 LAST
+ * ✅ 404 — MUST BE LAST
  */
 app.use((req, res) => {
   console.log("UNMATCHED:", req.method, req.originalUrl);
