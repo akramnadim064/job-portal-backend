@@ -6,7 +6,7 @@
 // // REGISTER
 // router.post("/register", registerUser);
 
-// // LOGIN
+// LOGIN
 // router.post("/login", loginUser);
 
 // module.exports = router;

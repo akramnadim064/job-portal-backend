@@ -1,51 +1,73 @@
-// const express = require("express");
-// const dotenv = require("dotenv");
-// const cors = require("cors");
-// const connectDB = require("./config/db");
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const connectDB = require("./config/db");
 
-// dotenv.config();
+dotenv.config();
 
-// const app = express();
+const app = express();
 
-// // Middlewares
-// app.use(cors());
-// app.use(express.json());
-// app.use("/uploads", express.static("uploads"));
-// // app.use("/api/auth", require("./routes/authRoutes"));
-// // app.use("/api/auth", require("./routes/authRoutes"));
-// // app.use("/api/profile", require("./routes/profileRoutes"));
-// // app.use("/api/jobs", require("./routes/jobRoutes"));
-// // app.use("/api/applications", require("./routes/applicationRoutes"));
-// // app.use("/api", require("./routes/applicationRoutes"));
+// Middlewares
+
+const allowedOrigins = [
+  "https://job-portal-frontend-blush-zeta.vercel.app",
+  "http://localhost:3000",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like Postman, mobile apps)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // only if you use cookies/auth headers
+  })
+);
+
+
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
+// app.use("/api/auth", require("./routes/authRoutes"));
 // app.use("/api/auth", require("./routes/authRoutes"));
 // app.use("/api/profile", require("./routes/profileRoutes"));
 // app.use("/api/jobs", require("./routes/jobRoutes"));
 // app.use("/api/applications", require("./routes/applicationRoutes"));
-// app.use("/api/employer", require("./routes/employerDashboardRoutes"));
-// //app.use("/api/profile", require("./routes/profileRoutes"));
+// app.use("/api", require("./routes/applicationRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/profile", require("./routes/profileRoutes"));
+app.use("/api/jobs", require("./routes/jobRoutes"));
+app.use("/api/applications", require("./routes/applicationRoutes"));
+app.use("/api/employer", require("./routes/employerDashboardRoutes"));
+//app.use("/api/profile", require("./routes/profileRoutes"));
 
 
 
 
-// // Connect DB
-// connectDB();
+// Connect DB
+connectDB();
 
-// // Test route
-// app.get("/", (req, res) => {
-//   res.send("Job Portal API is running...");
-// });
+// Test route
+app.get("/", (req, res) => {
+  res.send("Job Portal API is running...");
+});
 
 
-// app.use((req, res) => {
-//   console.log("UNMATCHED:", req.method, req.originalUrl);
-//   res.status(404).json({ message: "Route not found" });
-// });
-// // Routes will be added later
-// // app.use("/api/auth", require("./routes/authRoutes"));
-// // app.use("/api/jobs", require("./routes/jobRoutes"));
+app.use((req, res) => {
+  console.log("UNMATCHED:", req.method, req.originalUrl);
+  res.status(404).json({ message: "Route not found" });
+});
+// Routes will be added later
+// app.use("/api/auth", require("./routes/authRoutes"));
+// app.use("/api/jobs", require("./routes/jobRoutes"));
 
-// const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
 
@@ -104,83 +126,75 @@
 
 
 
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const connectDB = require("./config/db");
+// const express = require("express");
+// const dotenv = require("dotenv");
+// const cors = require("cors");
+// const connectDB = require("./config/db");
 
-dotenv.config();
-connectDB();
+// dotenv.config();
+// connectDB();
 
-const app = express();
+// const app = express();
 
-/**
- * Allowed frontend origins
- */
-const allowedOrigins = [
-  "https://job-portal-frontend-blush-zeta.vercel.app",
-  "http://localhost:3000",
-];
+// /**
+//  * Allowed frontend origins
+//  */
+// const allowedOrigins = [
+//   "https://job-portal-frontend-blush-zeta.vercel.app",
+//   "http://localhost:3000",
+// ];
 
-/**
- * CORS configuration
- */
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (Postman, mobile apps, server-to-server)
-      if (!origin) return callback(null, true);
+// // 2. Configure the CORS options
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     // Check if the origin is in the allowed list
+//     // !origin allows requests without an origin (like Postman, mobile apps, or server-side curl)
+//     if (allowedOrigins.includes(origin) || !origin) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true, // Set to true if you need to send cookies or authorization headers
+//   optionsSuccessStatus: 200
+// };
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
 
-/**
- * Handle preflight requests
- */
-app.options("*", cors());
 
-/**
- * Body parser
- */
-app.use(express.json());
 
-/**
- * Routes
- */
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/profile", require("./routes/profileRoutes"));
-app.use("/api/jobs", require("./routes/jobRoutes"));
-app.use("/api/applications", require("./routes/applicationRoutes"));
-app.use("/api/employer", require("./routes/employerDashboardRoutes"));
+// /**
+//  * Body parser
+//  */
+// app.use(express.json());
 
-/**
- * Health check
- */
-app.get("/", (req, res) => {
-  res.send("Job Portal API is running...");
-});
+// /**
+//  * Routes
+//  */
+// app.use("ap/auth", require("./routes/authRoutes"));
+// app.use("ap/profile", require("./routes/profileRoutes"));
+// app.use("ap/jobs", require("./routes/jobRoutes"));
+// app.use("ap/applications", require("./routes/applicationRoutes"));
+// app.use("ap/employer", require("./routes/employerDashboardRoutes"));
 
-/**
- * 404 handler
- */
-app.use((req, res) => {
-  console.log("UNMATCHED:", req.method, req.originalUrl);
-  res.status(404).json({ message: "Route not found" });
-});
+// /**
+//  * Health check
+//  */
+// app.get("/", (req, res) => {
+//   res.send("Job Portal API is running...");
+// });
 
-/**
- * Server start
- */
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// /**
+//  * 404 handler
+//  */
+// app.use((req, res) => {
+//   console.log("UNMATCHED:", req.method, req.originalUrl);
+//   res.status(404).json({ message: "Route not found" });
+// });
+
+// /**
+//  * Server start
+//  */
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
