@@ -93,6 +93,83 @@
 
 
 
+// const express = require("express");
+// const dotenv = require("dotenv");
+// const cors = require("cors");
+// const connectDB = require("./config/db");
+
+// dotenv.config();
+// connectDB();
+
+// const app = express();
+
+// /* =======================
+//    CORS — MUST BE FIRST
+// ======================= */
+// const allowedOrigins = [
+//   "https://job-portal-frontend-blush-zeta.vercel.app",
+//   "http://localhost:3000",
+// ];
+
+// app.use((req, res, next) => {
+//   const origin = req.headers.origin;
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader("Access-Control-Allow-Origin", origin);
+//   }
+
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET,POST,PUT,DELETE,OPTIONS"
+//   );
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Content-Type, Authorization"
+//   );
+
+//   // 🚨 THIS IS THE KEY LINE
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(204);
+//   }
+
+//   next();
+// });
+
+// app.use(express.json());
+
+// /* =======================
+//    ROUTES
+// ======================= */
+// app.use("/api/auth", require("./routes/authRoutes"));
+// app.use("/api/profile", require("./routes/profileRoutes"));
+// app.use("/api/jobs", require("./routes/jobRoutes"));
+// app.use("/api/applications", require("./routes/applicationRoutes"));
+// app.use("/api/employer", require("./routes/employerDashboardRoutes"));
+
+// /* =======================
+//    HEALTH CHECK
+// ======================= */
+// app.get("/", (req, res) => {
+//   res.send("Job Portal API is running...");
+// });
+
+// /* =======================
+//    404
+// ======================= */
+// app.use((req, res) => {
+//   console.log("❌ UNMATCHED:", req.method, req.originalUrl);
+//   res.status(404).json({ message: "Route not found" });
+// });
+
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on port ${PORT}`);
+// });
+
+
+
+
+
+//Morning
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -103,64 +180,38 @@ connectDB();
 
 const app = express();
 
-/* =======================
-   CORS — MUST BE FIRST
-======================= */
-const allowedOrigins = [
-  "https://job-portal-frontend-blush-zeta.vercel.app",
-  "http://localhost:3000",
-];
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization"
-  );
-
-  // 🚨 THIS IS THE KEY LINE
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-
-  next();
-});
+/* ✅ SIMPLE & CORRECT CORS */
+app.use(
+  cors({
+    origin: [
+      "https://job-portal-frontend-blush-zeta.vercel.app",
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.json());
 
-/* =======================
-   ROUTES
-======================= */
+/* ROUTES */
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/employer", require("./routes/employerDashboardRoutes"));
 
-/* =======================
-   HEALTH CHECK
-======================= */
+/* HEALTH CHECK */
 app.get("/", (req, res) => {
   res.send("Job Portal API is running...");
 });
 
-/* =======================
-   404
-======================= */
+/* 404 HANDLER */
 app.use((req, res) => {
-  console.log("❌ UNMATCHED:", req.method, req.originalUrl);
   res.status(404).json({ message: "Route not found" });
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
